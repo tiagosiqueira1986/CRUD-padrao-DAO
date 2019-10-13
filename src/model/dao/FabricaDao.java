@@ -1,5 +1,6 @@
 package model.dao;
 
+import db.DB;
 import model.dao.implementacao.VendedorDaoJDBC;
 /*
  * Serve para no momento da instânciação o objeto não acessar a implementação 
@@ -8,6 +9,6 @@ import model.dao.implementacao.VendedorDaoJDBC;
 public class FabricaDao {
 	
 	public static VendedorDao criaVendedorDao() {
-		return new VendedorDaoJDBC();
+		return new VendedorDaoJDBC(DB.getConnection());
 	}
 }
