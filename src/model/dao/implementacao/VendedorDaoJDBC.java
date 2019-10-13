@@ -50,8 +50,7 @@ public class VendedorDaoJDBC implements VendedorDao {
 		ResultSet rs = null;
 		try {
 			st = conn.prepareStatement(
-					"SELECT vendedor.*, "
-					+ "departamento.nome "
+					"SELECT vendedor.*, departamento.depNome "
 					+ "FROM vendedor INNER JOIN departamento "
 					+ "ON vendedor.departamentoId = departamento.id "
 					+ "WHERE vendedor.id = ? ");
@@ -90,7 +89,7 @@ public class VendedorDaoJDBC implements VendedorDao {
 	private Departamento instanciaDepartamento(ResultSet rs) throws SQLException {
 		Departamento dep = new Departamento();
 		dep.setId(rs.getInt("departamentoId"));
-		dep.setNome(rs.getString("nome"));
+		dep.setNome(rs.getString("depNome"));
 		return dep;
 	}
 
@@ -101,9 +100,44 @@ public class VendedorDaoJDBC implements VendedorDao {
 	}
 
 	@Override
-	public List<Vendedor> findByDepartamento(Departamento departamento) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public List<Vendedor> buscarPorDepartamento(Departamento departamento) {
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		try {
+			st = conn.prepareStatement(
+					"SELECT vendedor.*, departamento.depNome "
+					+ "FROM vendedor INNER JOIN departamento "
+					+ "ON vendedor.departamentoId = departamento.Id "
+					+ "WHERE departamentoId = ? "
+					+ "ORDER BY nome ");
+			
+			st.setInt(1, departamento.getId());
+			
+			rs = st.executeQuery();
+			
+			List<Vendedor> lista = new ArrayList<>();
+			Map<Integer, Departamento> map = new HashMap<>();
+			
+			while (rs.next()) { // testa se trouxe algum resultado na consulta
+				
+				Departamento dep = map.get(rs.getInt("departamentoId"));
+				
+				if(dep == null) {
+					dep = instanciaDepartamento(rs);
+					map.put(rs.getInt("departamentoId"), dep);
+				}	
 
+				Vendedor obj = instanciaVendedor(rs, dep);
+				lista.add(obj);
+			}
+			return lista;
+		} 
+		catch(SQLException e) {
+			throw new DbException(e.getMessage());
+		} finally {
+			DB.closeStatement(st);
+			DB.closeResultSet(rs);
+			//fechar a conexão somente no programa, pois ela pode ser usada em outros métodos
+		}	
+	}
 }
