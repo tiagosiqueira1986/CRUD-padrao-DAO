@@ -3,6 +3,7 @@ package application;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Scanner;
 
 import model.dao.FabricaDao;
 import model.dao.VendedorDao;
@@ -12,6 +13,8 @@ import model.entities.Vendedor;
 public class Programa {
 
 	public static void main(String[] args) {
+		
+		Scanner sc = new Scanner(System.in);
 		
 		VendedorDao vendedorDao = FabricaDao.criaVendedorDao();
 		
@@ -41,7 +44,13 @@ public class Programa {
 		vendedor = vendedorDao.buscarPorId(1);
 		vendedor.setNome("Martha Waine");
 		vendedorDao.atualizar(vendedor);
-		System.out.println("Atualização efetuada! ");		
+		System.out.println("Atualização efetuada! ");
+		
+		System.out.println("\n=== Teste 6: deletar Vendedor===");
+		System.out.println("Entre com o Id que será deletado: ");
+		int id = sc.nextInt();
+		vendedorDao.deletarPorId(id);
+		System.out.println("Registro deletado! ");
 	}
 
 }
